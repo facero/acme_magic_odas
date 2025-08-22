@@ -97,9 +97,8 @@ def create_fake_legend(ax, source_name, excluded_source_name):
 def plot_on_off_regions_skymap(
     observation,
     skymap_geom,
-    source_coords,
-    exclusion_region_center,
-    exclusion_region_radius,
+    on_region,
+    exclusion_region,
     n_off_regions,
     source_name,
     excluded_source_name,
@@ -109,8 +108,8 @@ def plot_on_off_regions_skymap(
 
     log.info(f"making ON and OFF regions skymap plot for run {observation.obs_id}")
 
-    # let us assume, to draw the ON and OFF regions, the maximum value of RAD_MAX
-    rad_max = np.max(observation.rad_max.data)
+    # get the pointing coordinates
+    pointing_coords = observation.pointing.get_icrs()
 
     # plotting starts here
     fig = plt.figure()
@@ -122,32 +121,28 @@ def plot_on_off_regions_skymap(
     wcs = counts.geom.wcs
     # plot the countmap
     ax = counts.plot(cmap="viridis", add_cbar=True)
+    # add the counts label
+    ax.images[-1].colorbar.set_label("counts", rotation=270, labelpad=12, fontsize=10)
 
     # add the pointing and the wobbling
     # wobbling distance
-    wobble_radius = observation.pointing_radec.separation(source_coords).to_value("deg")
-    pointing = PointSkyRegion(observation.pointing_radec)
-    pointing.to_pixel(wcs).plot(ax=ax, color="goldenrod", marker="+", markersize=12)
+    wobble_radius = observation.pointing.get_icrs().separation(on_region.center).to_value("deg")
+    pointing_region = PointSkyRegion(pointing_coords)
+    pointing_region.to_pixel(wcs).plot(ax=ax, color="goldenrod", marker="+", markersize=12)
     wobble_circle = CircleSkyRegion(
-        center=observation.pointing_radec, radius=Angle(f"{wobble_radius} deg")
+        center=pointing_coords, radius=Angle(f"{wobble_radius} deg")
     )
     wobble_circle.to_pixel(wcs).plot(ax=ax, edgecolor="goldenrod", ls="--", linewidth=2)
 
-    # plot the ON region, create a new one with an actual extension
-    on_region_circle = CircleSkyRegion(
-        center=source_coords, radius=Angle(f"{rad_max} deg")
-    )
-    on_region_circle.to_pixel(wcs).plot(ax=ax, edgecolor="crimson", linewidth=2)
+    # plot the ON region
+    on_region.to_pixel(wcs).plot(ax=ax, edgecolor="crimson", linewidth=2)
 
     # plot the source positions and the exclusion mask
-    PointSkyRegion(source_coords).to_pixel(wcs).plot(
+    PointSkyRegion(on_region.center).to_pixel(wcs).plot(
         ax=ax, color="crimson", marker="*", markersize=12
     )
-    PointSkyRegion(exclusion_region_center).to_pixel(wcs).plot(
+    PointSkyRegion(exclusion_region.center).to_pixel(wcs).plot(
         ax=ax, color="k", marker="*", markersize=12
-    )
-    exclusion_region = CircleSkyRegion(
-        center=exclusion_region_center, radius=exclusion_region_radius
     )
     exclusion_region.to_pixel(wcs).plot(ax=ax, edgecolor="k", ls="-", linewidth=2)
 
@@ -155,13 +150,13 @@ def plot_on_off_regions_skymap(
     region_finder = WobbleRegionsFinder(n_off_regions=n_off_regions)
     # find the OFF regions centers
     off_regions, wcs = region_finder.run(
-        region=PointSkyRegion(source_coords), center=observation.pointing_radec
+        region=PointSkyRegion(on_region.center), center=pointing_coords
     )
 
     # plot the OFF regions
     for off_region in off_regions:
         off_region_circle = CircleSkyRegion(
-            center=off_region.center, radius=Angle(f"{rad_max} deg")
+            center=off_region.center, radius=Angle(f"{on_region.radius.value} deg")
         )
         off_region_circle.to_pixel(ax.wcs).plot(
             ax=ax, edgecolor="dodgerblue", linewidth=2
@@ -175,9 +170,9 @@ def plot_on_off_regions_skymap(
     if show:
         plt.show()
 
-    fig.savefig(
-        f"run_{observation.obs_id}_theta_max_{rad_max}_n_off_regions_{n_off_regions}.png"
-    )
+#    fig.savefig(
+#        f"run_{observation.obs_id}_theta_max_{on_region.radius.value}_n_off_regions_{n_off_regions}.png"
+#    )
 
 
 def plot_gammapy_lc_points(ax, lc, color, label, alpha=1.0):
@@ -218,11 +213,17 @@ def plot_gammapy_lc_points(ax, lc, color, label, alpha=1.0):
     )
 
 
-def plot_gammapy_sed(ax, spectral_model, flux_points, e_min, e_max, color, label):
-    """Make a plot of the broadband spectrum"""
+def plot_gammapy_sed(ax, spectral_model, flux_points, color, label):
+    """Make a plot of the broadband spectrum and of the flux points.
+    As for the convention used in MAGIC, we will plot the broadband model
+    from the first to the last energy bin center."""
+
+
+    e_min = flux_points.energy_ref[0]
+    e_max = flux_points.energy_ref[-1]
 
     plot_kwargs = {
-        "energy_bounds": [e_min, e_max],
+        "energy_bounds": (e_min, e_max),
         "sed_type": "e2dnde",
         "yunits": u.Unit("TeV cm-2 s-1"),
         "xunits": u.GeV,

@@ -1,6 +1,7 @@
 # ACME-sponsored 1st MAGIC Open Data-Analysis School
 
-This repository contains the material and the data for the [1st open MAGIC data-analysis school](https://acme-magic-odas.sciencesconf.org/).
+This repository contains the material for the [1st open MAGIC data-analysis school](https://acme-magic-odas.sciencesconf.org/).
+The corresponding data will soon be provided as well. 
 
 ## Context
 Gamma-ray astronomy at the highest energy has been traditionally conducted with proprietary data and software.
@@ -17,11 +18,18 @@ the experience acquired in the school will be directly transferable to the analy
 All the material (lessons and hands-on recording, data, and software) will remain openly available in this repository after the school.
 
 ## Introductory material
-If you are not familiar with Gamma-ray astronomy, you can find an [introductory lecture on this field](https://www.youtube.com/@magictelescopes8632/) 
-and on [the analysis of its data](https://www.youtube.com/@magictelescopes8632/)
-in the [MAGIC Collaboration's YouTube Channel](https://www.youtube.com/@magictelescopes8632/).
+If you are not familiar with Gamma-ray astronomy, you can find an [introductory lecture](https://youtu.be/xvbSOgyHxrQ) on this field and another on the [analysis of its data](https://youtu.be/HqxcLnD2uMs) in the [MAGIC Collaboration's YouTube Channel](https://www.youtube.com/@magictelescopes8632/).
 
 ## Software Requirements
-The only software required to succesfully participate in the school is [Gammapy](https://gammapy.org/).   
+The only software required to successfully participate in the school is [Gammapy](https://gammapy.org/).   
 Check the installation instructions [here](https://docs.gammapy.org/1.3/getting-started/index.html#installation).   
 We recommend creating a virtual environment, as shown [here](https://docs.gammapy.org/1.3/getting-started/index.html#recommended-setup).
+
+## Get started
+Clone this git repository to your own machine (inside your dedicated conda environment), e.g.:
+```bash
+git clone https://github.com/magic-telescopes/acme_magic_odas.git
+
+
+
+We hope you enjoy the school! Please don't hesitate to reach out if you have any questions.

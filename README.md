@@ -22,8 +22,8 @@ If you are not familiar with Gamma-ray astronomy, you can find an [introductory 
 
 ## Software Requirements
 The only software required to successfully participate in the school is [Gammapy](https://gammapy.org/).   
-Check the installation instructions [here](https://docs.gammapy.org/1.3/getting-started/index.html#installation).   
-We recommend creating a virtual environment, as shown [here](https://docs.gammapy.org/1.3/getting-started/index.html#recommended-setup).
+Check the installation instructions [here](https://docs.gammapy.org/1.3/getting-started/index.html#installation) and follow through this whole [section](https://docs.gammapy.org/1.3/getting-started/index.html#recommended-setup) to download the tutorial datasets and set some variables. 
+These are needed by some notebooks in the school to work properly.   
 
 ## Get started
 Clone this git repository to your own machine (inside your dedicated conda environment), e.g.:

@@ -126,9 +126,13 @@ def plot_on_off_regions_skymap(
 
     # add the pointing and the wobbling
     # wobbling distance
-    wobble_radius = observation.pointing.get_icrs().separation(on_region.center).to_value("deg")
+    wobble_radius = (
+        observation.pointing.get_icrs().separation(on_region.center).to_value("deg")
+    )
     pointing_region = PointSkyRegion(pointing_coords)
-    pointing_region.to_pixel(wcs).plot(ax=ax, color="goldenrod", marker="+", markersize=12)
+    pointing_region.to_pixel(wcs).plot(
+        ax=ax, color="goldenrod", marker="+", markersize=12
+    )
     wobble_circle = CircleSkyRegion(
         center=pointing_coords, radius=Angle(f"{wobble_radius} deg")
     )
@@ -169,6 +173,7 @@ def plot_on_off_regions_skymap(
 
     if show:
         plt.show()
+
 
 #    fig.savefig(
 #        f"run_{observation.obs_id}_theta_max_{on_region.radius.value}_n_off_regions_{n_off_regions}.png"
@@ -217,7 +222,6 @@ def plot_gammapy_sed(ax, spectral_model, flux_points, color, label):
     """Make a plot of the broadband spectrum and of the flux points.
     As for the convention used in MAGIC, we will plot the broadband model
     from the first to the last energy bin center."""
-
 
     e_min = flux_points.energy_ref[0]
     e_max = flux_points.energy_ref[-1]
